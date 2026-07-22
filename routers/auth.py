@@ -1,9 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
 from werkzeug.security import check_password_hash
 
-from backend.database import get_connection
-from backend.schemas import LoginRequest, LoginResponse
-
+from database import get_connection
+from schemas import LoginRequest, LoginResponse
 
 router = APIRouter(
     prefix="/auth",
@@ -16,14 +15,17 @@ def login(datos: LoginRequest):
     connection = get_connection()
 
     try:
-        usuario = connection.execute(
-            """
-            SELECT id, nombre, correo, password
-            FROM usuarios
-            WHERE correo = ?
-            """,
-            (datos.correo.lower(),),
-        ).fetchone()
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, nombre, correo, password
+                FROM usuarios
+                WHERE correo = %s
+                """,
+                (datos.correo.lower(),),
+            )
+
+            usuario = cursor.fetchone()
 
     finally:
         connection.close()

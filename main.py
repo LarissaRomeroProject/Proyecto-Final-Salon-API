@@ -2,8 +2,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from backend.database import create_tables
-from backend.routers.auth import router as auth_router
+from database import create_tables
+from routers.auth import router as auth_router
 
 
 @asynccontextmanager
